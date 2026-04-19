@@ -38,65 +38,13 @@ Why use a simple HTML file when you can use:
 
 ## 📂 Project Anatomy
 ```text
-├── app/              # Where the magic (lack of) happens
-├── components/       # High-quality UI for low-quality ideas
-├── start_dev.py      # A Python script to run JS. Why? Why not.
-└── README.md         # You are currently reading the best part of the app
-## 📂 Project Structure
-```text
-
-├── app/              # Next.js App Router (pages and layouts)
-├── assets/           # Static images and icons
-├── components/       # Reusable UI components (shadcn/ui)
-├── hooks/            # Custom React hooks
-├── lib/              # Utility functions and shared logic
-├── public/           # Static assets
-├── styles/           # Global CSS and Tailwind styles
-├── types/            # TypeScript interfaces and types
-└── start_dev.py      # Custom development helper script
+├── app/              # The brain (currently resting)
+├── components/       # Beautiful UI for bad ideas
+├── hooks/            # React magic that does... something
+├── lib/              # The "Utility" folder (mostly empty promises)
+├── start_dev.py      # The "I'm a Python developer now" button
+└── package.json      # A list of things this app doesn't really need
 
 
-## 🚀 Getting Started
-Prerequisites
-Node.js (Latest LTS)
-pnpm installed globally
-Installation
-Clone the repository:
-code
-Bash
-git clone https://github.com/meow7781/ship-or-sink.git
-cd ship-or-sink
-Install dependencies:
-code
-Bash
-pnpm install
-Run the development server:
-code
-Bash
-pnpm dev
-# OR use the helper script
-python start_dev.py
-Open http://localhost:3000 with your browser to see the result.
-🤝 Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
-Fork the Project
-Create your Feature Branch (git checkout -b feature/AmazingFeature)
-Commit your Changes (git commit -m 'Add some AmazingFeature')
-Push to the Branch (git push origin feature/AmazingFeature)
-Open a Pull Request
-📄 License
-Distributed under the MIT License. See LICENSE for more information.
-Built with ❤️ by meow7781
-code
-Code
-***
 
-### Why this README works well:
-1.  **Visual Hierarchy:** Uses badges and emojis to make it scannable and modern.
-2.  **Clear Stack:** Immediately tells a developer what technologies are used.
-3.  **Installation Instructions:** Clear, step-by-step guide to get the project running.
-4.  **Structure Tree:** Helps people navigate your codebase without opening every folder.
-5.  **Status Badges:** Shows that the project is professional and uses industry-standard tools like TypeScript and Next.js.
-
-**Pro-tip:** Once you have a screenshot of the app running, add a `## 📸 Screenshots` section under the features! High-quality visuals are the #1 way to make a GitHub repo look professional.
 
