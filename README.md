@@ -20,6 +20,11 @@
 > "A triumph of technology over common sense." — *Nobody, 2024*
 ## App Image
 <img width="1696" height="949" alt="Screenshot 2026-04-19 at 9 11 13 AM" src="https://github.com/user-attachments/assets/b00fd841-847a-4cff-aec8-9959666ebc64" />
+<img width="1710" height="948" alt="Screenshot 2026-04-19 at 9 14 53 AM" src="https://github.com/user-attachments/assets/0b578929-f4ad-4857-b20e-90edd00d5fba" />
+<img width="1710" height="1112" alt="Screenshot 2026-04-19 at 9 14 59 AM" src="https://github.com/user-attachments/assets/3900a3c8-d5b7-424c-a9c8-1dd8e8ac0f78" />
+<img width="1709" height="951" alt="Screenshot 2026-04-19 at 9 14 42 AM" src="https://github.com/user-attachments/assets/780027c2-f2f7-47a7-8111-b619b54c4a98" />
+
+
 
 ## ❓ What is this?
 **Ship or Sink** is a cutting-edge, high-performance, enterprise-grade solution to a problem that literally does not exist. While other developers are building "AI-powered SaaS platforms" and "Financial Ecosystems," I spent my time making sure this specific set of pixels looks incredible while doing absolutely nothing productive.
