@@ -18,6 +18,8 @@
 - **⚡ Fast Workflows:** Managed with `pnpm` for efficient dependency handling.
 
 > "A triumph of technology over common sense." — *Nobody, 2024*
+## App Image
+<img width="1696" height="949" alt="Screenshot 2026-04-19 at 9 11 13 AM" src="https://github.com/user-attachments/assets/b00fd841-847a-4cff-aec8-9959666ebc64" />
 
 ## ❓ What is this?
 **Ship or Sink** is a cutting-edge, high-performance, enterprise-grade solution to a problem that literally does not exist. While other developers are building "AI-powered SaaS platforms" and "Financial Ecosystems," I spent my time making sure this specific set of pixels looks incredible while doing absolutely nothing productive.
