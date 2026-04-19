@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 > [!NOTE]
-> [Enter a one-sentence elevator pitch for your app here. e.g., "A modern platform for evaluating products and making tough decisions."]
+> "A platform for evaluating products and making tough decisions."]
 
 ## ✨ Features
 
