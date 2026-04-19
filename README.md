@@ -36,6 +36,18 @@ Why use a simple HTML file when you can use:
 - **Components:** shadcn/ui (for that "I know what I'm doing" aesthetic)
 - **Package Manager:** pnpm (because I'm in a rush to get nowhere)
 
+## ⭐ Show Some Love!
+If this app made you laugh, or if you just feel bad for how much time I spent on this, please give this repo a star!
+Every star helps me pretend that this was a productive use of my weekend.
+🤝 Contributing
+If you have a way to make this app even more useless, please open a Pull Request. I am currently looking for:
+A button that moves away from your cursor.
+A loading bar that goes backward.
+More TypeScript types for things that don't exist.
+📄 License
+This project is licensed under the MIT License - which means you are free to take this useless code and make it your own useless code.
+
+
 ## 📂 Project Anatomy
 ```text
 ├── app/              # The brain (currently resting)
