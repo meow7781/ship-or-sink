@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { selectLocalAssetMeme } from './memeAssets'
 
-export type AppStep = 'loading' | 'landing' | 'input' | 'processing' | 'result' | 'scrapbook'
+export type AppStep = 'landing' | 'input' | 'processing' | 'result' | 'scrapbook'
 export type PredictionMode = 'delulu' | 'roast' | 'predict'
 export type ThemeMode = 'light' | 'pink' | 'chaos'
 export type ThemeSelection = ThemeMode | 'random'
@@ -54,7 +54,7 @@ interface PredictionState {
 export const usePredictionStore = create<PredictionState>()(
   persist(
     (set) => ({
-      step: 'loading',
+      step: 'landing',
       mode: 'delulu',
       theme: 'light',
       question: '',

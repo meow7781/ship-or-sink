@@ -15,6 +15,7 @@ const defaultSoundUrls: Record<string, string> = {
   dramatic: "https://assets.mixkit.co/active_storage/sfx/2020/2020-preview.mp3",
   funny: "https://assets.mixkit.co/active_storage/sfx/2016/2016-preview.mp3",
   likee: "https://assets.mixkit.co/active_storage/sfx/4747/4747-preview.mp3",
+  waah: "https://assets.mixkit.co/active_storage/sfx/2219/2219-preview.mp3",
 }
 
 type SoundName = keyof typeof defaultSoundUrls

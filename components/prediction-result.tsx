@@ -21,7 +21,8 @@ export function PredictionResult() {
     usedMemeIds,
     addUsedMemeId,
     theme,
-    soundEnabled
+    soundEnabled,
+    addToScrapbook
   } = usePredictionStore()
   
   const [stat, setStat] = useState({ label: "HEARTBREAK ODDS", value: "99.9%" })
@@ -30,6 +31,8 @@ export function PredictionResult() {
   const [isLoadingMeme, setIsLoadingMeme] = useState(true)
   const [showMeme, setShowMeme] = useState(false)
   const [isPlayingVoice, setIsPlayingVoice] = useState(false)
+  const [isSaved, setIsSaved] = useState(false)
+  const [hasImageError, setHasImageError] = useState(false)
   const hasLoadedMemeRef = useRef(false)
   
   useEffect(() => {
@@ -106,7 +109,7 @@ export function PredictionResult() {
   
   const handlePlayVoice = async () => {
     setIsPlayingVoice(true)
-    soundManager.play("dramatic")
+    soundManager.play("waah")
     
     // Simulate TTS with funny sound
     setTimeout(() => {
@@ -127,6 +130,21 @@ export function PredictionResult() {
     soundManager.play("magic")
     setStep("input")
   }
+
+  const handleSaveToScrapbook = () => {
+    if (!prediction || !memeUrl || isSaved) return
+
+    addToScrapbook({
+      question,
+      prediction,
+      memeUrl,
+      mode,
+      stat,
+      roastComment,
+    })
+    setIsSaved(true)
+    soundManager.play("waah")
+  }
   
   const modeColors: Record<string, string> = {
     delulu: "#9b59b6",
@@ -141,6 +159,12 @@ export function PredictionResult() {
   }
   
   const accentColor = modeColors[mode] || "#e85d4c"
+  const showImagePanel = Boolean(memeUrl) && !hasImageError
+  const fallbackLines = [
+    "No meme image landed, so the universe sent subtitles instead.",
+    memeCaption || "This prediction is too dramatic to stay silent.",
+    prediction || "Your fate is buffering with extra emotional damage.",
+  ]
   
   return (
     <div className={`min-h-screen flex flex-col items-center justify-center px-4 py-8 ${theme === "chaos" ? "chaos-shake" : ""}`}>
@@ -177,7 +201,7 @@ export function PredictionResult() {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-lg mx-auto"
+        className="w-full max-w-5xl mx-auto"
       >
         {/* Main Result Card */}
         <motion.div
@@ -199,203 +223,247 @@ export function PredictionResult() {
             &quot;{question}&quot;
           </p>
           
-          {/* Meme Image with API loading */}
-          <div className="relative rounded-xl overflow-hidden mb-4 bg-muted min-h-64">
-            <AnimatePresence mode="wait">
-              {isLoadingMeme ? (
-                <motion.div
-                  key="loading"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="absolute inset-0 flex flex-col items-center justify-center gap-3"
-                >
-                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                  <p className="text-sm text-muted-foreground">Fetching the perfect meme...</p>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="meme"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: showMeme ? 1 : 0, scale: showMeme ? 1 : 0.8 }}
-                  transition={{ type: "spring", bounce: 0.4 }}
-                >
-                  {memeUrl && (
-                    <img
-                      src={memeUrl}
-                      alt="Reaction meme"
-                      className="w-full h-64 object-cover"
-                      crossOrigin="anonymous"
-                    />
+          <div className="mb-4 grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
+            <div className="space-y-4">
+              <div className="relative rounded-xl overflow-hidden bg-muted min-h-64 lg:min-h-[26rem]">
+                <AnimatePresence mode="wait">
+                  {isLoadingMeme ? (
+                    <motion.div
+                      key="loading"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute inset-0 flex flex-col items-center justify-center gap-3"
+                    >
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                      <p className="text-sm text-muted-foreground">Fetching the perfect meme...</p>
+                    </motion.div>
+                  ) : showImagePanel ? (
+                    <motion.div
+                      key="meme"
+                      initial={{ opacity: 0, x: -18 }}
+                      animate={{ opacity: showMeme ? 1 : 0, x: showMeme ? 0 : -18 }}
+                      transition={{ duration: 0.35 }}
+                      className="h-full"
+                    >
+                      <img
+                        src={memeUrl!}
+                        alt="Reaction meme"
+                        className="h-full min-h-64 w-full object-cover"
+                        crossOrigin="anonymous"
+                        onError={() => setHasImageError(true)}
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="fallback"
+                      initial={{ opacity: 0, x: 18 }}
+                      animate={{ opacity: showMeme ? 1 : 0, x: showMeme ? 0 : 18 }}
+                      transition={{ duration: 0.35 }}
+                      className="absolute inset-0 flex flex-col justify-between bg-gradient-to-br from-card via-muted/60 to-secondary/20 p-6"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span
+                          className="rounded-full px-3 py-1 text-xs font-bold text-white"
+                          style={{ backgroundColor: accentColor }}
+                        >
+                          TEXT MODE
+                        </span>
+                        <span className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
+                          GG TRANSLATE
+                        </span>
+                      </div>
+
+                      <div className="space-y-4">
+                        {fallbackLines.map((line, index) => (
+                          <motion.p
+                            key={`${line}-${index}`}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.15 + index * 0.12 }}
+                            className={index === 0 ? "text-lg font-semibold text-foreground" : "text-base leading-7 text-muted-foreground"}
+                          >
+                            {line}
+                          </motion.p>
+                        ))}
+                      </div>
+
+                      <div className="text-sm font-medium" style={{ color: accentColor }}>
+                        If the meme misses, the words still hit.
+                      </div>
+                    </motion.div>
                   )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-            
-            {/* Meme Caption Overlay */}
-            {showMeme && !isLoadingMeme && (
-              <motion.div 
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4"
-              >
-                <p className="text-white text-sm font-medium" style={{ color: accentColor }}>
-                  &quot;{memeCaption || prediction?.substring(0, 50) + "..."}&quot;
+                </AnimatePresence>
+
+                {showMeme && !isLoadingMeme && showImagePanel && (
+                  <motion.div 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4"
+                  >
+                    <p className="text-white text-sm font-medium" style={{ color: accentColor }}>
+                      &quot;{memeCaption || prediction?.substring(0, 50) + "..."}&quot;
+                    </p>
+                  </motion.div>
+                )}
+
+                {mode === "delulu" && showMeme && (
+                  <motion.div
+                    className="absolute top-3 right-3 px-2 py-1 rounded text-xs font-bold text-white"
+                    style={{ backgroundColor: accentColor }}
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  >
+                    MAX DELULU
+                  </motion.div>
+                )}
+
+                {soundEnabled && showMeme && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute top-3 left-3 p-2 rounded-full bg-black/50"
+                  >
+                    <Volume2 className="w-4 h-4 text-white animate-pulse" />
+                  </motion.div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 pt-1">
+                <motion.button
+                  onClick={handlePlayVoice}
+                  disabled={isPlayingVoice}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-sm ${isPlayingVoice ? "opacity-50" : ""}`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  data-cursor-hover
+                >
+                  {isPlayingVoice ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Play className="w-4 h-4" />
+                  )}
+                  {isPlayingVoice ? "Playing vibe..." : "Listen Vibe"}
+                </motion.button>
+
+                <motion.button
+                  onClick={handleShare}
+                  className="p-2 rounded-full bg-muted"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  data-cursor-hover
+                >
+                  <Share2 className="w-4 h-4" />
+                </motion.button>
+
+                <div className="flex-1" />
+
+                <motion.button
+                  onClick={() => soundManager.play("pop")}
+                  className="p-2 rounded-full hover:bg-muted"
+                  whileHover={{ scale: 1.1 }}
+                  data-cursor-hover
+                >
+                  <ThumbsUp className="w-4 h-4 text-muted-foreground" />
+                </motion.button>
+                <motion.button
+                  onClick={() => soundManager.play("click")}
+                  className="p-2 rounded-full hover:bg-muted"
+                  whileHover={{ scale: 1.1 }}
+                  data-cursor-hover
+                >
+                  <ThumbsDown className="w-4 h-4 text-muted-foreground" />
+                </motion.button>
+              </div>
+            </div>
+
+            <div className="flex flex-col rounded-[1.5rem] border border-border/70 bg-muted/30 p-5">
+              <p className={`text-base text-foreground mb-5 leading-relaxed md:text-lg ${theme === "chaos" ? "chaos-rainbow" : ""}`}>
+                {prediction}
+              </p>
+
+              <div className="flex items-center justify-between py-3 border-t border-border">
+                <span className="text-sm text-muted-foreground">{stat.label}</span>
+                <motion.span 
+                  className={`font-bold ${theme === "chaos" ? "animate-wiggle" : ""}`}
+                  style={{ color: accentColor }}
+                  animate={theme === "chaos" ? { scale: [1, 1.1, 1] } : {}}
+                  transition={{ duration: 0.5, repeat: Infinity }}
+                >
+                  {stat.value}
+                </motion.span>
+              </div>
+
+              <div className="pt-4 border-t border-border">
+                <p className={`text-sm text-muted-foreground italic leading-7 ${theme === "chaos" ? "text-destructive" : ""}`}>
+                  {roastComment}
                 </p>
-              </motion.div>
-            )}
+              </div>
+
+              <div className="mt-5 rounded-[1.25rem] border border-border/70 bg-background/80 p-4">
+                <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Reaction subtitle</p>
+                <p className="mt-2 text-sm leading-6 text-foreground">
+                  {showImagePanel
+                    ? "Meme image loaded. Left side shows the visual hit, right side explains the emotional damage."
+                    : "No image showed up, so this card translated the meme energy into animated text instead."}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Actions */}
+          <div className="flex flex-col gap-3 pt-2">
+            <motion.button
+              onClick={handleRevealFate}
+              className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full text-white font-semibold ${theme === "chaos" ? "animate-scale-pulse" : ""}`}
+              style={{ backgroundColor: accentColor }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              data-cursor-hover
+            >
+              <Sparkles className="w-5 h-5" />
+              Reveal Fate
+            </motion.button>
             
-            {/* MAX DELULU Badge */}
-            {mode === "delulu" && showMeme && (
-              <motion.div
-                className="absolute top-3 right-3 px-2 py-1 rounded text-xs font-bold text-white"
-                style={{ backgroundColor: accentColor }}
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 1, repeat: Infinity }}
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button
+                onClick={handleTryAgain}
+                variant="outline"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full"
+                data-cursor-hover
               >
-                MAX DELULU
-              </motion.div>
-            )}
-            
-            {/* Sound indicator */}
-            {soundEnabled && showMeme && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute top-3 left-3 p-2 rounded-full bg-black/50"
+                <RotateCcw className="w-4 h-4" />
+                Ask Again
+              </Button>
+              
+              <Button
+                onClick={handleShare}
+                variant="outline"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full"
+                data-cursor-hover
               >
-                <Volume2 className="w-4 h-4 text-white animate-pulse" />
-              </motion.div>
-            )}
-          </div>
-          
-          {/* Prediction Text */}
-          <p className={`text-base text-foreground mb-4 leading-relaxed ${theme === "chaos" ? "chaos-rainbow" : ""}`}>
-            {prediction}
-          </p>
-          
-          {/* Stats Row */}
-          <div className="flex items-center justify-between py-3 border-t border-border">
-            <span className="text-sm text-muted-foreground">{stat.label}</span>
-            <motion.span 
-              className={`font-bold ${theme === "chaos" ? "animate-wiggle" : ""}`}
-              style={{ color: accentColor }}
-              animate={theme === "chaos" ? { scale: [1, 1.1, 1] } : {}}
-              transition={{ duration: 0.5, repeat: Infinity }}
-            >
-              {stat.value}
-            </motion.span>
-          </div>
-          
-          {/* Roast Comment */}
-          <div className="pt-3 border-t border-border">
-            <p className={`text-sm text-muted-foreground italic ${theme === "chaos" ? "text-destructive" : ""}`}>
-              {roastComment}
-            </p>
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3 mt-4 pt-4 border-t border-border">
-            <motion.button
-              onClick={handlePlayVoice}
-              disabled={isPlayingVoice}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-sm ${isPlayingVoice ? "opacity-50" : ""}`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              data-cursor-hover
-            >
-              {isPlayingVoice ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Play className="w-4 h-4" />
-              )}
-              {isPlayingVoice ? "Playing..." : "Play Voice"}
-            </motion.button>
+                <Twitter className="w-4 h-4" />
+                Share
+              </Button>
+            </div>
             
             <motion.button
-              onClick={handleShare}
-              className="p-2 rounded-full bg-muted"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              onClick={handleSaveToScrapbook}
+              className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold border-2 ${theme === "chaos" ? "border-dashed animate-wiggle" : ""}`}
+              style={{
+                borderColor: accentColor,
+                color: isSaved ? "#ffffff" : accentColor,
+                backgroundColor: isSaved ? accentColor : "transparent",
+              }}
+              whileHover={{ scale: 1.02, backgroundColor: isSaved ? accentColor : `${accentColor}10` }}
+              whileTap={{ scale: 0.98 }}
               data-cursor-hover
             >
-              <Share2 className="w-4 h-4" />
-            </motion.button>
-            
-            <div className="flex-1" />
-            
-            <motion.button
-              onClick={() => soundManager.play("pop")}
-              className="p-2 rounded-full hover:bg-muted"
-              whileHover={{ scale: 1.1 }}
-              data-cursor-hover
-            >
-              <ThumbsUp className="w-4 h-4 text-muted-foreground" />
-            </motion.button>
-            <motion.button
-              onClick={() => soundManager.play("click")}
-              className="p-2 rounded-full hover:bg-muted"
-              whileHover={{ scale: 1.1 }}
-              data-cursor-hover
-            >
-              <ThumbsDown className="w-4 h-4 text-muted-foreground" />
+              <Star className="w-5 h-5" />
+              {isSaved ? "SAVED TO SCRAPBOOK" : "ADD TO SCRAPBOOK"}
             </motion.button>
           </div>
-        </motion.div>
-        
-        {/* Bottom Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex flex-col gap-3"
-        >
-          <motion.button
-            onClick={handleRevealFate}
-            className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full text-white font-semibold ${theme === "chaos" ? "animate-scale-pulse" : ""}`}
-            style={{ backgroundColor: accentColor }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            data-cursor-hover
-          >
-            <Sparkles className="w-5 h-5" />
-            Reveal Fate
-          </motion.button>
-          
-          <div className="flex gap-3">
-            <Button
-              onClick={handleTryAgain}
-              variant="outline"
-              className="flex-1 flex items-center justify-center gap-2 rounded-full"
-              data-cursor-hover
-            >
-              <RotateCcw className="w-4 h-4" />
-              Ask Again
-            </Button>
-            
-            <Button
-              onClick={handleShare}
-              variant="outline"
-              className="flex-1 flex items-center justify-center gap-2 rounded-full"
-              data-cursor-hover
-            >
-              <Twitter className="w-4 h-4" />
-              Share
-            </Button>
-          </div>
-          
-          <motion.button
-            onClick={() => soundManager.play("magic")}
-            className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold border-2 ${theme === "chaos" ? "border-dashed animate-wiggle" : ""}`}
-            style={{ borderColor: accentColor, color: accentColor }}
-            whileHover={{ scale: 1.02, backgroundColor: `${accentColor}10` }}
-            whileTap={{ scale: 0.98 }}
-            data-cursor-hover
-          >
-            <Star className="w-5 h-5" />
-            ADD TO SCRAPBOOK
-          </motion.button>
         </motion.div>
         
         {/* Disclaimer */}
