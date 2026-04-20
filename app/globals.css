@@ -156,9 +156,25 @@
   }
   body {
     @apply bg-background text-foreground;
-    cursor: none;
+    cursor: auto;
     filter: var(--chaos-filter, none);
     transition: background-color 0.3s ease, color 0.3s ease, filter 0.3s ease;
+  }
+
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  summary,
+  [role='button'] {
+    cursor: pointer;
+  }
+
+  input,
+  textarea,
+  select {
+    cursor: text;
   }
 }
 

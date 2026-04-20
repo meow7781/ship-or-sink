@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { usePredictionStore, type PredictionMode } from "@/lib/store"
 import { soundManager } from "@/lib/sounds"
-import { ArrowLeft, Brain, Volume2, VolumeX, Sparkles, Flame, Eye, Send } from "lucide-react"
+import { ArrowLeft, Brain, Volume2, VolumeX, Sparkles, Flame, Eye, Send, Plus } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 
 const modeConfig: Record<PredictionMode, { label: string; icon: typeof Sparkles; color: string; description: string }> = {
@@ -61,6 +61,8 @@ export function PredictionInput() {
     toggleSound 
   } = usePredictionStore()
   const [inputValue, setInputValue] = useState("")
+  const [placeholderIndex, setPlaceholderIndex] = useState(0)
+  const [showComposerTools, setShowComposerTools] = useState(false)
   
   const handleSubmit = async () => {
     if (!inputValue.trim()) return
@@ -81,6 +83,16 @@ export function PredictionInput() {
   }
   
   const currentMode = modeConfig[mode]
+  const dynamicPlaceholder = exampleQuestions[mode][placeholderIndex] || "Ask your life question..."
+
+  useEffect(() => {
+    setPlaceholderIndex(0)
+    const interval = setInterval(() => {
+      setPlaceholderIndex((current) => (current + 1) % exampleQuestions[mode].length)
+    }, 2400)
+
+    return () => clearInterval(interval)
+  }, [mode])
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -91,7 +103,7 @@ export function PredictionInput() {
             soundManager.play("click")
             setStep("landing")
           }}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-2 rounded-[999px] px-4 py-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           data-cursor-hover
         >
           <ArrowLeft className="w-5 h-5" />
@@ -99,23 +111,6 @@ export function PredictionInput() {
         </button>
         
         <div className="flex items-center gap-6">
-          {/* Deep Thinking Mode Toggle */}
-          <motion.div 
-            className="flex items-center gap-3 bg-muted px-4 py-2 rounded-full"
-            whileHover={{ scale: 1.02 }}
-          >
-            <Brain className="w-5 h-5" style={{ color: deepThinkingMode ? "#9b59b6" : "var(--muted-foreground)" }} />
-            <span className="text-sm font-medium">Think Harder</span>
-            <Switch 
-              checked={deepThinkingMode} 
-              onCheckedChange={() => {
-                soundManager.play("click")
-                toggleDeepThinking()
-              }}
-            />
-          </motion.div>
-          
-          {/* Sound Toggle */}
           <button
             onClick={() => {
               toggleSound()
@@ -144,7 +139,7 @@ export function PredictionInput() {
             <motion.button
               key={key}
               onClick={() => handleModeChange(key)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all"
+              className="flex items-center gap-2 px-6 py-3 rounded-[999px] font-semibold text-sm shadow-sm transition-all"
               style={{
                 backgroundColor: mode === key ? config.color : "var(--muted)",
                 color: mode === key ? "white" : "var(--foreground)",
@@ -181,29 +176,71 @@ export function PredictionInput() {
           transition={{ delay: 0.2 }}
         >
           <div className="relative">
-            <textarea
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ask your life question..."
-              className="w-full h-32 p-5 pr-14 text-lg bg-card border border-border rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault()
-                  handleSubmit()
-                }
-              }}
-            />
-            <motion.button
-              onClick={handleSubmit}
-              className="absolute bottom-4 right-4 p-3 rounded-xl text-white"
-              style={{ backgroundColor: currentMode.color }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              disabled={!inputValue.trim()}
-              data-cursor-hover
-            >
-              <Send className="w-5 h-5" />
-            </motion.button>
+            <div className="rounded-[1.75rem] border border-border bg-card shadow-sm">
+              <textarea
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder={dynamicPlaceholder}
+                className="w-full h-32 bg-transparent p-5 text-lg resize-none focus:outline-none rounded-t-[1.75rem] placeholder:text-muted-foreground"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault()
+                    handleSubmit()
+                  }
+                }}
+              />
+
+              <div className="flex items-center justify-between gap-3 border-t border-border/70 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <motion.button
+                    type="button"
+                    onClick={() => {
+                      soundManager.play("click")
+                      setShowComposerTools((current) => !current)
+                    }}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground"
+                    whileHover={{ scale: 1.06 }}
+                    whileTap={{ scale: 0.94 }}
+                    data-cursor-hover
+                  >
+                    <Plus className="h-5 w-5" />
+                  </motion.button>
+
+                  <AnimatePresence>
+                    {showComposerTools && (
+                      <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        className="flex items-center gap-3 rounded-full bg-muted px-4 py-2"
+                      >
+                        <Brain className="w-4 h-4" style={{ color: deepThinkingMode ? "#9b59b6" : "var(--muted-foreground)" }} />
+                        <span className="text-sm font-medium">Think Harder</span>
+                        <Switch 
+                          checked={deepThinkingMode} 
+                          onCheckedChange={() => {
+                            soundManager.play("click")
+                            toggleDeepThinking()
+                          }}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <motion.button
+                  onClick={handleSubmit}
+                  className="rounded-[1.25rem] p-3 text-white shadow-sm"
+                  style={{ backgroundColor: currentMode.color }}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  disabled={!inputValue.trim()}
+                  data-cursor-hover
+                >
+                  <Send className="w-5 h-5" />
+                </motion.button>
+              </div>
+            </div>
           </div>
           
           {/* Example Questions */}
@@ -214,7 +251,7 @@ export function PredictionInput() {
                 <motion.button
                   key={question}
                   onClick={() => handleExampleClick(question)}
-                  className="px-4 py-2 text-sm bg-muted hover:bg-border rounded-full transition-colors text-foreground"
+                  className="px-4 py-2 text-sm bg-muted hover:bg-border rounded-[999px] border border-border/50 transition-colors text-foreground"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + i * 0.05 }}
